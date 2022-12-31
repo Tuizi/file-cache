@@ -1,0 +1,20 @@
+# Ignore all node_modules directories
+**/node_modules
+
+# Ignore compiled and minified files
+dist/
+
+# Ignore compiled TypeScript definition files
+*.d.ts
+
+# Ignore compiled TypeScript source maps
+*.map
+
+# Ignore npm debug logs
+npm-debug.log*
+
+# Ignore Jest test reports
+coverage/
+
+# Ignore TypeScript cache
+.tscache
