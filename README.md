@@ -1,4 +1,5 @@
 # File Cache
+
 [![Generated with ChatGPT](https://img.shields.io/badge/generated%20with-ChatGPT-blue.svg)](https://openai.com/blog/chatgpt/)
 
 A simple file cache system for Node.js.
@@ -6,7 +7,7 @@ A simple file cache system for Node.js.
 ## Installation
 
 ```bash
-npm install file-cache
+npm install @tuizi/file-cache
 ```
 
 ## Usage
@@ -14,17 +15,17 @@ npm install file-cache
 ```javascript
 const FileCache = require("file-cache");
 
-const filecache = new FileCache("./cache");
+const cache = new FileCache("./cache");
 
 // Set a key-value pair in the cache with a ttl of 1000ms
-await filecache.set("key", "value", { ttl: 1000 });
+await cache.set("key", "value", { ttl: 1000 });
 
 // Get a value from the cache
-console.log(await filecache.get("key"));
+console.log(await cache.get("key"));
 
 // The value will be removed from the cache after 1000ms
 setTimeout(async () => {
-  console.log(await filecache.get("key"));
+  console.log(await cache.get("key"));
 }, 2000);
 ```
 
