@@ -1,4 +1,4 @@
-import fs from "fs";
+import * as fs from "fs";
 import { FileCache } from "./file-cache";
 
 jest.useFakeTimers();
