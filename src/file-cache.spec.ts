@@ -2,14 +2,7 @@ import * as fs from "fs";
 import { FileCache } from "./file-cache";
 
 jest.useFakeTimers();
-jest.mock("fs", () => ({
-  promises: {
-    readFile: jest.fn(),
-    writeFile: jest.fn(),
-    mkdir: jest.fn(),
-    unlink: jest.fn(),
-  },
-}));
+jest.mock("fs");
 
 describe("set/get string", () => {
   const cachePath = "./cache";
