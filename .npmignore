@@ -1,0 +1,6 @@
+# ignore the src folder
+src/
+.git/
+.github/
+tsconfig.json
+__mocks__/
