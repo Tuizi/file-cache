@@ -1,6 +1,6 @@
 {
   "name": "@tuizi/file-cache",
-  "version": "0.1.0-beta",
+  "version": "0.1.0",
   "description": "A simple file cache system for Node.js. The cache is stored in memory and on the filesystem, allowing for fast access and persistence between runs.",
   "main": "dist/index.js",
   "engines": {
