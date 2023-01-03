@@ -12,58 +12,90 @@ npm install @tuizi/file-cache
 
 ## Usage
 
-```javascript
-const FileCache = require("file-cache");
+```ts
+import { FileCache } from "./file-cache";
 
-const cache = new FileCache("./cache");
+const cache = new FileCache();
 
-// Set a key-value pair in the cache with a ttl of 1000ms
-await cache.set("key", "value", { ttl: 1000 });
+// Store a string value in the cache and file system
+await cache.set("key", "value");
 
-// Get a value from the cache
-console.log(await cache.get("key"));
+// Retrieve the value from the cache and file system
+const value = await cache.get("key");
 
-// The value will be removed from the cache after 1000ms
-setTimeout(async () => {
-  console.log(await cache.get("key"));
-}, 2000);
+// Store a JSON value in the cache and file system
+await cache.setJSON("key", { foo: "bar" });
+
+// Retrieve the JSON value from the cache and file system
+const jsonValue = await cache.getJSON("key");
 ```
 
 ## API
 
-### `FileCache`
-
-#### `constructor(cacheDir: string)`
+### `new FileCache(cachePath?: string)`
 
 Creates a new `FileCache` instance.
 
 ##### Parameters
 
-- `cacheDir`: The directory where the cache files will be stored.
+- `cachePath?: string`: Optional path to the cache directory. Defaults to `./cache`.
 
-#### `set(key: string, value: any, options?: { ttl: number })`
+---
 
-Sets a key-value pair in the cache.
+### `set(key: string, value: string, options?: { ttl?: number }): Promise<void>`
 
-##### Parameters
-
-- `key`: The key to set.
-- `value`: The value to set.
-- `options`: An optional object with the following properties:
-  - `ttl`: The time to live for the cache item, in milliseconds. If not provided, the default value is 3600 (1 hour).
-
-#### `get(key: string)`
-
-Gets the value for a key from the cache.
+Stores a value in the cache and file system.
 
 ##### Parameters
 
-- `key`: The key to get.
+- `key: string`: Key of the value to be stored.
+- `value: string`: Value to be stored.
+- `options?: { ttl?: number }`: Optional object with the following properties:
+  - `ttl?: number`: Time-to-live in seconds. If set, the value will be deleted from the cache and file system after the specified number of seconds.
 
 ##### Returns
 
-The value for the key, or `undefined` if the key is not in the cache.
+- `Promise<void>`: A promise that resolves when the value has been stored.
 
-```
+---
 
-```
+### `get(key: string): Promise<string | undefined>`
+
+Retrieves a value from the cache and file system.
+
+##### Parameters
+
+- `key: string`: Key of the value to be retrieved.
+
+##### Returns
+
+- `Promise<string | undefined>`: A promise that resolves with the value if it exists, or `undefined` if the value does not exist or has expired.
+
+---
+
+### `setJSON(key: string, value: any, options?: { ttl?: number }): Promise<void>`
+
+Stores a JSON-serializable value in the cache and file system.
+
+##### Parameters
+
+- `key: string`: Key of the value to be stored.
+- `value: any`: JSON-serializable value to be stored.
+- `options?: { ttl?: number }`: Optional object with the following properties:
+  - `ttl?: number`: Time-to-live in seconds. If set, the value will be deleted from the cache and file system after the specified number of seconds.
+
+##### Returns
+
+- `Promise<void>`: A promise that resolves when the value has been stored.
+
+### `getJSON(key: string): Promise<any | undefined>`
+
+Retrieves a JSON-serializable value from the cache and file system.
+
+##### Parameters
+
+- `key: string`: Key of the value to be retrieved.
+
+##### Returns
+
+- `Promise<any | undefined>`: A promise that resolves with the value if it exists and is a valid JSON string, or `undefined` if the value does not exist, has expired, or is not a valid JSON string.
