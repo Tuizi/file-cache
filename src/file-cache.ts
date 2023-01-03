@@ -1,31 +1,53 @@
 import * as fs from "fs";
-import * as path from "path";
 
 export class FileCache {
   private readonly cachePath: string;
   private readonly cache: Map<string, string>;
 
-  constructor(cachePath: string) {
+  constructor(cachePath = "./cache") {
     this.cachePath = cachePath;
     this.cache = new Map<string, string>();
+
+    // Create the cache folder if it does not exist. This is useful in case the cache folder
+    // has been deleted or moved. It also ensures that the folder is present before any
+    // cache operations are performed.
+    fs.promises.mkdir(this.cachePath, { recursive: true });
+  }
+
+  private getFilePath(key: string): string {
+    return `${this.cachePath}/${key}`;
+  }
+
+  async set(
+    key: string,
+    value: string,
+    options: { ttl?: number } = {}
+  ): Promise<void> {
+    this.cache.set(key, value);
+    const filePath = this.getFilePath(key);
+
+    await fs.promises.writeFile(filePath, value);
+
+    if (options.ttl) {
+      setTimeout(() => {
+        this.cache.delete(key);
+        fs.promises.unlink(filePath);
+      }, options.ttl * 1000);
+    }
   }
 
   async get(key: string): Promise<string | undefined> {
-    // Check the in-memory cache first
     if (this.cache.has(key)) {
       return this.cache.get(key);
     }
 
-    console.debug(`Cache miss for key "${key}"`);
-
-    // If the key is not in the in-memory cache, try reading it from the file system
-    const filePath = path.join(this.cachePath, key);
     try {
-      const data = await fs.promises.readFile(filePath, "utf8");
+      const filePath = this.getFilePath(key);
+      const value = await fs.promises.readFile(filePath, "utf-8");
 
-      // If the data was found on the file system, store it in the in-memory cache
-      this.cache.set(key, data);
-      return data;
+      this.cache.set(key, value);
+
+      return value;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         return undefined;
@@ -34,44 +56,23 @@ export class FileCache {
     }
   }
 
-  async getJSON<T>(key: string): Promise<T | undefined> {
-    const data = await this.get(key);
-    if (data === undefined) {
-      return undefined;
-    }
-    try {
-      return JSON.parse(data);
-    } catch (error) {
-      throw new Error(`Failed to parse JSON data for key "${key}"`);
-    }
-  }
-
-  async set(
+  async setJSON(
     key: string,
-    value: string,
+    value: any,
     options: { ttl?: number } = {}
   ): Promise<void> {
-    // Store the value in the in-memory cache
-    this.cache.set(key, value);
+    // Convert the value to a JSON string
+    const valueString = JSON.stringify(value);
 
-    // Write the value to the file system
-    const filePath = path.join(this.cachePath, key);
-    await fs.promises.writeFile(filePath, value);
-
-    // Set a timeout to delete the cache file if a TTL is specified
-    if (options.ttl) {
-      setTimeout(() => {
-        fs.promises.unlink(filePath);
-      }, options.ttl);
-    }
+    // Use the set method to store the JSON string in the cache and file system
+    await this.set(key, valueString, options);
   }
 
-  async setJSON<T>(
-    key: string,
-    value: T,
-    options: { ttl?: number } = {}
-  ): Promise<void> {
-    const data = JSON.stringify(value);
-    return this.set(key, data, options);
+  async getJSON<T>(key: string): Promise<T> {
+    // Retrieve the value from the cache and file system
+    const valueString = await this.get(key);
+
+    // Convert the value string to a JavaScript object
+    return valueString ? JSON.parse(valueString) : undefined;
   }
 }
