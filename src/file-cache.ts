@@ -1,9 +1,22 @@
 import * as fs from "fs";
 
+/**
+ * A class for storing key-value pairs in a cache and on the file system.
+ */
 export class FileCache {
+  /**
+   * The path to the cache folder.
+   */
   private readonly cachePath: string;
+  /**
+   * A map for storing key-value pairs in memory.
+   */
   private readonly cache: Map<string, string>;
 
+  /**
+   * Creates a new FileCache instance.
+   * @param cachePath The path to the cache folder. Defaults to "./cache".
+   */
   constructor(cachePath = "./cache") {
     this.cachePath = cachePath;
     this.cache = new Map<string, string>();
@@ -14,10 +27,23 @@ export class FileCache {
     fs.promises.mkdir(this.cachePath, { recursive: true });
   }
 
+  /**
+   * Returns the file path for the given key.
+   * @param key The key.
+   * @returns The file path.
+   */
   private getFilePath(key: string): string {
     return `${this.cachePath}/${key}`;
   }
 
+  /**
+   * Stores the given value in the cache and on the file system.
+   * @param key The key.
+   * @param value The value.
+   * @param options An options object.
+   * @param options.ttl The time to live for the key-value pair in seconds. The value will be deleted from the cache and file system after this time.
+   * @returns A promise that resolves when the value has been stored.
+   */
   async set(
     key: string,
     value: string,
@@ -36,6 +62,11 @@ export class FileCache {
     }
   }
 
+  /**
+   * Retrieves the value for the given key from the cache and file system.
+   * @param key The key.
+   * @returns The value, or undefined if the key is not found.
+   */
   async get(key: string): Promise<string | undefined> {
     if (this.cache.has(key)) {
       return this.cache.get(key);
@@ -56,6 +87,14 @@ export class FileCache {
     }
   }
 
+  /**
+   * Stores the given value in the cache and on the file system as a JSON string.
+   * @param key The key.
+   * @param value The value.
+   * @param options An options object.
+   * @param options.ttl The time to live for the key-value pair in seconds. The value will be deleted from the cache and file system after this time.
+   * @returns A promise that resolves when the value has been stored.
+   */
   async setJSON(
     key: string,
     value: any,
@@ -68,6 +107,11 @@ export class FileCache {
     await this.set(key, valueString, options);
   }
 
+  /**
+   * Retrieves the value for the given key from the cache and file system and parses it as a JSON object.
+   * @param key The key.
+   * @returns The parsed value, or undefined if the key is not found.
+   */
   async getJSON<T>(key: string): Promise<T> {
     // Retrieve the value from the cache and file system
     const valueString = await this.get(key);
