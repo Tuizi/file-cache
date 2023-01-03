@@ -4,8 +4,6 @@ import { FileCache } from "./file-cache";
 jest.useFakeTimers();
 jest.mock("fs");
 
-// TODO: Fix why it is so hard to mock fs.promises? Work locally but not in CI.
-
 describe("set/get string", () => {
   const cachePath = "./cache";
   let cache: FileCache;

@@ -6,4 +6,3 @@ const promises = {
 };
 
 export { promises };
-export default { promises };
