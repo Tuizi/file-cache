@@ -3,7 +3,7 @@ name: Publish to npm
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
@@ -20,7 +20,9 @@ jobs:
         run: npm run build
       - name: Test the project
         run: npm test
+      - name: Authenticate with npm
+        uses: actions/npm-auth@v2
+        with:
+          npm_auth: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Publish to npm
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
