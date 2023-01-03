@@ -4,3 +4,4 @@ src/
 .github/
 tsconfig.json
 __mocks__/
+*.spec.js
