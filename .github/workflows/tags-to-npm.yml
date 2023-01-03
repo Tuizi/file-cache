@@ -1,0 +1,26 @@
+name: Tags to npm
+
+on:
+  push:
+    tags:
+      - 'v\d+\.\d+\.\d+' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 19.2.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: 19.2.0
+      - name: Install dependencies
+        run: npm install
+      - name: Build the project
+        run: npm run build
+      - name: Test the project
+        run: npm test
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
