@@ -1,4 +1,4 @@
-import { promises } from "fs";
+import * as fs from "fs";
 import { FileCache } from "./file-cache";
 
 jest.useFakeTimers();
@@ -16,7 +16,7 @@ describe("set/get string", () => {
     await cache.set("key", "value");
 
     expect(await cache.get("key")).toBe("value");
-    expect(promises.writeFile).toHaveBeenCalledWith(
+    expect(fs.promises.writeFile).toHaveBeenCalledWith(
       `${cachePath}/key`,
       "value"
     );
@@ -27,7 +27,7 @@ describe("set/get string", () => {
     await cache.set("key", "value", { ttl });
 
     expect(await cache.get("key")).toBe("value");
-    expect(promises.writeFile).toHaveBeenCalledWith(
+    expect(fs.promises.writeFile).toHaveBeenCalledWith(
       `${cachePath}/key`,
       "value"
     );
@@ -35,17 +35,17 @@ describe("set/get string", () => {
     jest.advanceTimersByTime(ttl * 1000);
 
     expect(await cache.get("key")).toBeUndefined();
-    expect(promises.unlink).toHaveBeenCalledWith(`${cachePath}/key`);
+    expect(fs.promises.unlink).toHaveBeenCalledWith(`${cachePath}/key`);
   });
 
   it("should overwrite existing value in cache and file system", async () => {
-    jest.mocked(promises.writeFile).mockResolvedValue(undefined);
+    jest.mocked(fs.promises.writeFile).mockResolvedValue(undefined);
 
     await cache.set("key", "old-value");
     await cache.set("key", "new-value");
 
     expect(await cache.get("key")).toBe("new-value");
-    expect(promises.writeFile).toHaveBeenCalledWith(
+    expect(fs.promises.writeFile).toHaveBeenCalledWith(
       `${cachePath}/key`,
       "new-value"
     );
