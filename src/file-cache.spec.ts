@@ -6,12 +6,12 @@ jest.mock("fs");
 
 // TODO: Fix why it is so hard to mock fs.promises? Work locally but not in CI.
 
-describe.skip("set/get string", () => {
+describe("set/get string", () => {
   const cachePath = "./cache";
   let cache: FileCache;
 
   beforeEach(() => {
-    cache = new FileCache(cachePath);
+    cache = new FileCache({ cachePath });
   });
 
   it("should set value in cache and file system", async () => {
@@ -54,12 +54,12 @@ describe.skip("set/get string", () => {
   });
 });
 
-describe.skip("get/set JSON", () => {
+describe("get/set JSON", () => {
   const cachePath = "./cache-json";
   let cache: FileCache;
 
   beforeEach(() => {
-    cache = new FileCache(cachePath);
+    cache = new FileCache({ cachePath });
   });
 
   it("should return undefined for non-existent key", async () => {

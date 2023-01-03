@@ -1,30 +1,49 @@
 import * as fs from "fs";
 
 /**
+ * Options for the `FileCache` constructor.
+ * @interface CtorOptions
+ */
+interface CtorOptions {
+  /**
+   * The path to the cache.
+   * @type {string}
+   * @memberof CtorOptions
+   */
+  cachePath: string;
+  /**
+   * The time-to-live (TTL) in seconds.
+   * @type {number}
+   * @memberof CtorOptions
+   */
+  ttl?: number;
+}
+
+/**
  * A class for storing key-value pairs in a cache and on the file system.
  */
 export class FileCache {
   /**
-   * The path to the cache folder.
+   * The options for the `FileCache` constructor.
+   * @private
+   * @type {CtorOptions}
+   * @memberof FileCache
    */
-  private readonly cachePath: string;
+  private readonly options: CtorOptions;
+
   /**
    * A map for storing key-value pairs in memory.
    */
   private readonly cache: Map<string, string>;
 
-  /**
-   * Creates a new FileCache instance.
-   * @param cachePath The path to the cache folder. Defaults to "./cache".
-   */
-  constructor(cachePath = "./cache") {
-    this.cachePath = cachePath;
+  constructor(options: CtorOptions = { cachePath: "./cache" }) {
+    this.options = options;
     this.cache = new Map<string, string>();
 
     // Create the cache folder if it does not exist. This is useful in case the cache folder
     // has been deleted or moved. It also ensures that the folder is present before any
     // cache operations are performed.
-    fs.promises.mkdir(this.cachePath, { recursive: true });
+    fs.promises.mkdir(options.cachePath, { recursive: true });
   }
 
   /**
@@ -33,7 +52,7 @@ export class FileCache {
    * @returns The file path.
    */
   private getFilePath(key: string): string {
-    return `${this.cachePath}/${key}`;
+    return `${this.options.cachePath}/${key}`;
   }
 
   /**
@@ -54,11 +73,13 @@ export class FileCache {
 
     await fs.promises.writeFile(filePath, value);
 
-    if (options.ttl) {
+    const ttl = options.ttl || this.options.ttl;
+
+    if (ttl) {
       setTimeout(() => {
         this.cache.delete(key);
         fs.promises.unlink(filePath);
-      }, options.ttl * 1000);
+      }, ttl * 1000);
     }
   }
 
