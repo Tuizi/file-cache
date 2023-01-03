@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import { promises } from "fs";
 
 export class FileCache {
   private readonly cachePath: string;
@@ -11,7 +11,7 @@ export class FileCache {
     // Create the cache folder if it does not exist. This is useful in case the cache folder
     // has been deleted or moved. It also ensures that the folder is present before any
     // cache operations are performed.
-    fs.promises.mkdir(this.cachePath, { recursive: true });
+    promises.mkdir(this.cachePath, { recursive: true });
   }
 
   private getFilePath(key: string): string {
@@ -26,12 +26,12 @@ export class FileCache {
     this.cache.set(key, value);
     const filePath = this.getFilePath(key);
 
-    await fs.promises.writeFile(filePath, value);
+    await promises.writeFile(filePath, value);
 
     if (options.ttl) {
       setTimeout(() => {
         this.cache.delete(key);
-        fs.promises.unlink(filePath);
+        promises.unlink(filePath);
       }, options.ttl * 1000);
     }
   }
@@ -43,7 +43,7 @@ export class FileCache {
 
     try {
       const filePath = this.getFilePath(key);
-      const value = await fs.promises.readFile(filePath, "utf-8");
+      const value = await promises.readFile(filePath, "utf-8");
 
       this.cache.set(key, value);
 
