@@ -11,3 +11,4 @@ mockFs.promises = {
 };
 
 module.exports = mockFs;
+module.exports.default = mockFs;

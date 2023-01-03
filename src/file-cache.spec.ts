@@ -1,8 +1,7 @@
-import fs from "fs";
+import * as fs from "fs";
 import { FileCache } from "./file-cache";
 
 jest.useFakeTimers();
-jest.mock("fs");
 
 describe("set/get string", () => {
   const cachePath = "./cache";
