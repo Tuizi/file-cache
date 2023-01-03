@@ -68,6 +68,10 @@ export class FileCache {
     value: string,
     options: { ttl?: number } = {}
   ): Promise<void> {
+    if (typeof value !== "string") {
+      throw new Error("value must be a string");
+    }
+
     this.cache.set(key, value);
     const filePath = this.getFilePath(key);
 
